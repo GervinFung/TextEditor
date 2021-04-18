@@ -11,4 +11,5 @@ public enum KeyboardKey {
     public final String OPEN_FILE = "Open File", OPEN_WINDOW = "Open Window";
     public final String WRITE_DATE = "Write Date", WRITE_COMPUTER_NAME = "Write System Name";
     public final String ZOOM_IN = "Zoom In", ZOOM_OUT = "Zoom Out";
+    public final String FIND_WORD = "Find Word", GOTO = "Go to";
 }

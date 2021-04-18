@@ -1,5 +1,6 @@
-## This is basic text editor of mine, written in Java
-### I wrote this text editor for fun
+## This is basic Notepad of mine, written in Java for fun
+
+#### It is Notepad, You can change the font size, cut, copy, paste and do all activities that a normal NotePad can do
 
 ## Interface of Text Editor
 
@@ -18,3 +19,7 @@
 ## Setting Menu
 
 ![Edit Menu](settingMenu.jpg)
+
+## Find Replace Menu
+
+![Edit Menu](findReplace.jpg)

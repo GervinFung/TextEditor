@@ -7,6 +7,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
@@ -30,6 +31,8 @@ import java.util.stream.Collectors;
 import static editor.TextEditor.createNewTextEditor;
 import static editor.TextEditor.createNewTextEditorWithFilePath;
 import static editor.textarea.KeyboardKey.KEYBOARD_KEY;
+import static java.awt.Frame.ICONIFIED;
+import static java.awt.Frame.NORMAL;
 
 public final class TextEditorArea extends JTextArea {
 
@@ -40,19 +43,31 @@ public final class TextEditorArea extends JTextArea {
     private static final UndoManager UNDO_MANAGER = new UndoManager();
 
     private String currentFilePath, currentContent;
+    private TextEditorSearch textEditorSearch;
+
     private final TextEditor textEditor;
 
     public void zoomOut() { this.setFont(this.getFont().deriveFont((float)this.getFont().getSize() - 1)); }
 
     public void zoomIn() { this.setFont(this.getFont().deriveFont((float)this.getFont().getSize() + 1)); }
 
+    public void setTextEditorSearchToNull() { this.textEditorSearch = null; }
+
+    public void disposeTextEditorSearch() {
+        if (this.textEditorSearch != null) {
+            this.textEditorSearch.dispose();
+        }
+    }
+
     public TextEditorArea(final TextEditor textEditor, final String currentFilePath, final String currentContent) {
         this.currentContent = Objects.requireNonNullElse(currentContent, "");
         this.setText(this.currentContent);
         this.currentFilePath = currentFilePath;
-
+        this.textEditorSearch = null;
         this.setFont(new Font("Times New Roman", Font.PLAIN, DEFAULT_FONT_SIZE));
         this.textEditor = textEditor;
+
+        this.textEditor.updateCursorPosition(this.currentContent.split("\n").length,1);
 
         this.getDocument().addUndoableEditListener(e -> UNDO_MANAGER.addEdit(e.getEdit()));
 
@@ -126,6 +141,16 @@ public final class TextEditorArea extends JTextArea {
             public void actionPerformed(final ActionEvent evt) { TextEditorArea.this.zoomOut(); }
         });
 
+        this.getActionMap().put(KEYBOARD_KEY.FIND_WORD, new AbstractAction(KEYBOARD_KEY.FIND_WORD) {
+            @Override
+            public void actionPerformed(final ActionEvent evt) { TextEditorArea.this.findReplace(); }
+        });
+
+        this.getActionMap().put(KEYBOARD_KEY.GOTO, new AbstractAction(KEYBOARD_KEY.GOTO) {
+            @Override
+            public void actionPerformed(final ActionEvent evt) { TextEditorArea.this.goToLine(); }
+        });
+
 
         this.getInputMap().put(KeyStroke.getKeyStroke("control Z"), KEYBOARD_KEY.UNDO_KEY);
         this.getInputMap().put(KeyStroke.getKeyStroke("control Y"), KEYBOARD_KEY.REDO_KEY);
@@ -141,11 +166,17 @@ public final class TextEditorArea extends JTextArea {
         this.getInputMap().put(KeyStroke.getKeyStroke("F4"), KEYBOARD_KEY.WRITE_COMPUTER_NAME);
         this.getInputMap().put(KeyStroke.getKeyStroke("F2"), KEYBOARD_KEY.ZOOM_IN);
         this.getInputMap().put(KeyStroke.getKeyStroke("F1"), KEYBOARD_KEY.ZOOM_OUT);
-
+        this.getInputMap().put(KeyStroke.getKeyStroke("control F"), KEYBOARD_KEY.FIND_WORD);
+        this.getInputMap().put(KeyStroke.getKeyStroke("control shift R"), KEYBOARD_KEY.FIND_WORD);
+        this.getInputMap().put(KeyStroke.getKeyStroke("F3"), KEYBOARD_KEY.FIND_WORD);
+        this.getInputMap().put(KeyStroke.getKeyStroke("shift F3"), KEYBOARD_KEY.FIND_WORD);
+        this.getInputMap().put(KeyStroke.getKeyStroke("control R"), KEYBOARD_KEY.FIND_WORD);
+        this.getInputMap().put(KeyStroke.getKeyStroke("control G"), KEYBOARD_KEY.GOTO);
 
         this.addCaretListener(e -> {
 
             try {
+
                 final int caretPosition = TextEditorArea.this.getCaretPosition();
 
                 final int lineNumber = TextEditorArea.this.getLineOfOffset(caretPosition);
@@ -257,11 +288,10 @@ public final class TextEditorArea extends JTextArea {
 
                 final List<String> allLines = bufferedReader.lines().collect(Collectors.toList());
 
-                final int size = allLines.size();
+                final int size = allLines.size() - 1;
 
-                for (int i = 0; i < allLines.size(); i++) {
-
-                    if (i == size - 1) {
+                for (int i = 0; i <= size; i++) {
+                    if (i == size) {
                         stringBuilder.append(allLines.get(i));
                     } else {
                         stringBuilder.append(allLines.get(i)).append("\n");
@@ -276,7 +306,7 @@ public final class TextEditorArea extends JTextArea {
 
                 return stringBuilder.toString();
 
-            } catch (final IOException ioException) { JOptionPane.showMessageDialog(this.getParent(), ioException.getMessage()); }
+            } catch (final IOException exception) { JOptionPane.showMessageDialog(this.getParent(), exception.getMessage()); }
         }
         return null;
     }
@@ -326,5 +356,50 @@ public final class TextEditorArea extends JTextArea {
     public void writeSystemName() {
         try { this.append(InetAddress.getLocalHost().getHostName()); }
         catch (final UnknownHostException e) { JOptionPane.showMessageDialog(this.getParent(), e.getMessage()); }
+    }
+
+    public void findReplace() {
+        SwingUtilities.invokeLater(() ->  {
+            if (this.textEditorSearch == null) {
+                this.textEditorSearch = new TextEditorSearch(this);
+            } else if (this.textEditorSearch.getState() == ICONIFIED) {
+                this.textEditorSearch.setState(NORMAL);
+            } else {
+                this.textEditorSearch.toFront();
+            }
+        });
+    }
+
+    public void goToLine() {
+
+        try {
+
+            final int goToLineNumber;
+
+            final int maxLength = this.getText().split("\n").length;
+
+            while(true) {
+                final String input = JOptionPane.showInputDialog(this.getParent(), "Which Line Do You Want To Go To?");
+                if (tryParseIntInRange(input, maxLength)) {
+                    goToLineNumber = Integer.parseInt(input) - 1;
+                    break;
+                } else {
+                    JOptionPane.showMessageDialog(this.getParent(), "Please enter number from 1 to " + maxLength + " only!", "Input Warning", JOptionPane.WARNING_MESSAGE);
+                }
+            }
+
+            this.setCaretPosition(this.getLineStartOffset(goToLineNumber));
+
+        } catch (final BadLocationException e) { JOptionPane.showMessageDialog(this.getParent(), e.getMessage()); }
+    }
+
+    private static boolean tryParseIntInRange(final String data, final int max) {
+        try {
+            final int temp = Integer.parseInt(data);
+            if (temp >= 1 && temp <= max) {
+                return true;
+            }
+        } catch (final NumberFormatException ignored) {}
+        return false;
     }
 }

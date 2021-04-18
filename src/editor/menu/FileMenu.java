@@ -2,75 +2,70 @@ package editor.menu;
 
 import editor.textarea.TextEditorArea;
 
-import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
-import static editor.TextEditorColor.TEXT_EDITOR_COLOR;
-
-public final class FileMenu extends JMenu {
+public final class FileMenu extends AbstractMenu {
 
     public FileMenu(final TextEditorArea textArea) {
-        super("File");
-        this.add(this.newFileMenuItem(textArea));
-        this.add(this.newWindowMenuItem(textArea));
+        super(textArea, "File");
+        this.add(this.newFileMenuItem());
+        this.add(this.newWindowMenuItem());
         this.addSeparator();
-		this.add(this.saveFileMenuItem(textArea));
-        this.add(this.saveAsMenuItem(textArea));
+		this.add(this.saveFileMenuItem());
+        this.add(this.saveAsMenuItem());
         this.addSeparator();
-		this.add(this.openFileMenuItem(textArea));
-		this.add(this.openWindowMenuItem(textArea));
+		this.add(this.openFileMenuItem());
+		this.add(this.openWindowMenuItem());
         this.addSeparator();
-		this.add(this.printFile(textArea));
-		this.add(this.quitFileMenuItem(textArea));
-		this.setForeground(TEXT_EDITOR_COLOR.BAR_FONT_COLOR);
+		this.add(this.printFile());
+		this.add(this.quitFileMenuItem());
     }
 
-
-    private JMenuItem newFileMenuItem(final TextEditorArea textArea) {
+    private JMenuItem newFileMenuItem() {
         final JMenuItem newFile = new JMenuItem("New File (CTRL + N)");
-        newFile.addActionListener(e -> textArea.createNewFile());
+        newFile.addActionListener(e -> super.getTextArea().createNewFile());
         return newFile;
     }
 
-    private JMenuItem newWindowMenuItem(final TextEditorArea textArea) {
+    private JMenuItem newWindowMenuItem() {
         final JMenuItem newWindow = new JMenuItem("New Window (CTRL + SHIFT + N)");
-        newWindow.addActionListener(e -> textArea.createNewWindow());
+        newWindow.addActionListener(e -> this.getTextArea().createNewWindow());
         return newWindow;
     }
 
-    private JMenuItem saveFileMenuItem(final TextEditorArea textArea) {
+    private JMenuItem saveFileMenuItem() {
         final JMenuItem saveFile = new JMenuItem("Save File (CTRL + S)");
-        saveFile.addActionListener(e -> textArea.saveFile());
+        saveFile.addActionListener(e -> this.getTextArea().saveFile());
         return saveFile;
     }
 
-    private JMenuItem saveAsMenuItem(final TextEditorArea textArea) {
+    private JMenuItem saveAsMenuItem() {
         final JMenuItem saveFile = new JMenuItem("Save As (CTRL + SHIFT + S)");
-        saveFile.addActionListener(e -> textArea.saveAs());
+        saveFile.addActionListener(e -> this.getTextArea().saveAs());
         return saveFile;
     }
 
-    private JMenuItem openFileMenuItem(final TextEditorArea textArea) {
+    private JMenuItem openFileMenuItem() {
         final JMenuItem openFile = new JMenuItem("Open File (CTRL + O)");
-        openFile.addActionListener(e -> textArea.saveFileBeforeOpening());
+        openFile.addActionListener(e -> this.getTextArea().saveFileBeforeOpening());
         return openFile;
     }
 
-    private JMenuItem openWindowMenuItem(final TextEditorArea textArea) {
+    private JMenuItem openWindowMenuItem() {
         final JMenuItem openWindow = new JMenuItem("Open File In New Window (CTRL + SHIFT + O)");
-        openWindow.addActionListener(e -> textArea.openFileInNewWindow());
+        openWindow.addActionListener(e -> this.getTextArea().openFileInNewWindow());
         return openWindow;
     }
 
-    private JMenuItem printFile(final TextEditorArea textArea) {
+    private JMenuItem printFile() {
         final JMenuItem printFile = new JMenuItem("Print File Content (CTRL + P)");
-        printFile.addActionListener(e -> textArea.printFile());
+        printFile.addActionListener(e -> this.getTextArea().printFile());
         return printFile;
     }
 
-    private JMenuItem quitFileMenuItem(final TextEditorArea textArea) {
+    private JMenuItem quitFileMenuItem() {
         final JMenuItem quitFile = new JMenuItem("Quit Application (CTRL + Q)");
-        quitFile.addActionListener(e -> textArea.quitApplication());
+        quitFile.addActionListener(e -> this.getTextArea().quitApplication());
         return quitFile;
     }
 }

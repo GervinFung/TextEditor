@@ -3,6 +3,7 @@ package editor;
 import editor.bottompanel.BottomPanel;
 import editor.menu.EditMenu;
 import editor.menu.FileMenu;
+import editor.menu.FindReplace;
 import editor.menu.SettingMenu;
 import editor.textarea.TextEditorArea;
 
@@ -36,12 +37,15 @@ public final class TextEditor extends JFrame {
             UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
         } catch (final ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ignored) { }
 
+        this.bottomPanel = new BottomPanel();
+
         final TextEditorArea textArea = new TextEditorArea(this, currentFilePath, content);
 
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(final WindowEvent e) {
                 if (textArea.quitApplication()) {
+                    textArea.disposeTextEditorSearch();
                     TextEditor.this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                 } else {
                     TextEditor.this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -50,8 +54,6 @@ public final class TextEditor extends JFrame {
         });
 
         final JPanel panel = this.createJPanel(textArea);
-
-        this.bottomPanel = new BottomPanel();
 
         this.add(this.createScrollPane(panel));
         this.add(this.bottomPanel, BorderLayout.SOUTH);
@@ -72,6 +74,7 @@ public final class TextEditor extends JFrame {
         menuBar.add(new FileMenu(textArea));
         menuBar.add(new EditMenu(textArea));
         menuBar.add(new SettingMenu(textArea, panel));
+        menuBar.add(new FindReplace(textArea));
         menuBar.setBackground(TEXT_EDITOR_COLOR.BAR_COLOR);
 
         return menuBar;
@@ -83,6 +86,7 @@ public final class TextEditor extends JFrame {
         panel.setCursor(Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR));
         panel.setBackground(TEXT_EDITOR_COLOR.TEXT_AREA_COLOR);
         panel.add(textArea, BorderLayout.WEST);
+        panel.setOpaque(true);
 
         return panel;
     }
@@ -90,15 +94,18 @@ public final class TextEditor extends JFrame {
     private JScrollPane createScrollPane(final JPanel panel) {
         final JScrollPane scrollPane = new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
-        final BasicScrollBarUI basicScrollBarUI = new BasicScrollBarUI() {
+        scrollPane.getVerticalScrollBar().setUI(new BasicScrollBarUI() {
             @Override
             protected void configureScrollBarColors(){
                 this.thumbColor = TEXT_EDITOR_COLOR.SCROLL_BAR_THUMB_COLOR;
             }
-        };
-
-        scrollPane.getVerticalScrollBar().setUI(basicScrollBarUI);
-        scrollPane.getHorizontalScrollBar().setUI(basicScrollBarUI);
+        });
+        scrollPane.getHorizontalScrollBar().setUI(new BasicScrollBarUI() {
+            @Override
+            protected void configureScrollBarColors(){
+                this.thumbColor = TEXT_EDITOR_COLOR.SCROLL_BAR_THUMB_COLOR;
+            }
+        });
 
         return scrollPane;
     }

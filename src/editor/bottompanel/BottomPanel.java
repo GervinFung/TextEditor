@@ -18,7 +18,7 @@ public final class BottomPanel extends JPanel {
     }
 
     private JLabel cursorPosition() {
-        final JLabel label = new JLabel("Line: 0 Column: 0");
+        final JLabel label = new JLabel();
         label.setVisible(true);
         label.setForeground(TEXT_EDITOR_COLOR.BAR_FONT_COLOR);
         return label;
