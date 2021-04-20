@@ -7,6 +7,7 @@ import editor.menu.FindReplace;
 import editor.menu.SettingMenu;
 import editor.textarea.TextEditorArea;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
@@ -52,7 +53,6 @@ public final class TextEditor extends JFrame {
                 }
             }
         });
-
         final JPanel panel = this.createJPanel(textArea);
 
         this.add(this.createScrollPane(panel));
@@ -75,7 +75,11 @@ public final class TextEditor extends JFrame {
         menuBar.add(new EditMenu(textArea));
         menuBar.add(new SettingMenu(textArea, panel));
         menuBar.add(new FindReplace(textArea));
-        menuBar.setBackground(TEXT_EDITOR_COLOR.BAR_COLOR);
+        menuBar.setBackground(TEXT_EDITOR_COLOR.DRACULA_MENU_COLOR);
+
+        menuBar.setBorder(null);
+
+        menuBar.setBorderPainted(false);
 
         return menuBar;
     }
@@ -84,9 +88,12 @@ public final class TextEditor extends JFrame {
         final JPanel panel = new JPanel(new BorderLayout());
 
         panel.setCursor(Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR));
-        panel.setBackground(TEXT_EDITOR_COLOR.TEXT_AREA_COLOR);
+        panel.setBackground(TEXT_EDITOR_COLOR.DRACULA_BACKGROUND_COLOR);
+        textArea.setBackground(TEXT_EDITOR_COLOR.DRACULA_BACKGROUND_COLOR);
+        textArea.setForeground(TEXT_EDITOR_COLOR.DRACULA_FONT_COLOR);
         panel.add(textArea, BorderLayout.WEST);
-        panel.setOpaque(true);
+
+        panel.setBorder(null);
 
         return panel;
     }
@@ -94,18 +101,49 @@ public final class TextEditor extends JFrame {
     private JScrollPane createScrollPane(final JPanel panel) {
         final JScrollPane scrollPane = new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
+        scrollPane.getHorizontalScrollBar().setBackground(TEXT_EDITOR_COLOR.BOTTOM_PANEL_COLOR);
+        scrollPane.getVerticalScrollBar().setBackground(TEXT_EDITOR_COLOR.BOTTOM_PANEL_COLOR);
+
         scrollPane.getVerticalScrollBar().setUI(new BasicScrollBarUI() {
             @Override
             protected void configureScrollBarColors(){
                 this.thumbColor = TEXT_EDITOR_COLOR.SCROLL_BAR_THUMB_COLOR;
             }
+            @Override
+            protected JButton createDecreaseButton(int orientation) {
+                JButton button = super.createDecreaseButton(orientation);
+                button.setBackground(TEXT_EDITOR_COLOR.BOTTOM_PANEL_COLOR);
+                return button;
+            }
+            @Override
+            protected JButton createIncreaseButton(int orientation) {
+                JButton button = super.createIncreaseButton(orientation);
+                button.setBackground(TEXT_EDITOR_COLOR.BOTTOM_PANEL_COLOR);
+                return button;
+            }
+
         });
         scrollPane.getHorizontalScrollBar().setUI(new BasicScrollBarUI() {
             @Override
             protected void configureScrollBarColors(){
                 this.thumbColor = TEXT_EDITOR_COLOR.SCROLL_BAR_THUMB_COLOR;
             }
+            @Override
+            protected JButton createDecreaseButton(int orientation) {
+                JButton button = super.createDecreaseButton(orientation);
+                button.setBackground(TEXT_EDITOR_COLOR.BOTTOM_PANEL_COLOR);
+                return button;
+            }
+
+            @Override
+            protected JButton createIncreaseButton(int orientation) {
+                JButton button = super.createIncreaseButton(orientation);
+                button.setBackground(TEXT_EDITOR_COLOR.BOTTOM_PANEL_COLOR);
+                return button;
+            }
         });
+
+        scrollPane.setBorder(null);
 
         return scrollPane;
     }

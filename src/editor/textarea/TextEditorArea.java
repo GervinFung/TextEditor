@@ -64,7 +64,7 @@ public final class TextEditorArea extends JTextArea {
         this.setText(this.currentContent);
         this.currentFilePath = currentFilePath;
         this.textEditorSearch = null;
-        this.setFont(new Font("Times New Roman", Font.PLAIN, DEFAULT_FONT_SIZE));
+        this.setFont(new Font("Consolas", Font.PLAIN, DEFAULT_FONT_SIZE));
         this.textEditor = textEditor;
 
         this.textEditor.updateCursorPosition(this.currentContent.split("\n").length,1);

@@ -13,7 +13,7 @@ public final class BottomPanel extends JPanel {
     public BottomPanel() {
         this.label = this.cursorPosition();
         this.add(this.label);
-        this.setBackground(TEXT_EDITOR_COLOR.BAR_COLOR);
+        this.setBackground(TEXT_EDITOR_COLOR.BOTTOM_PANEL_COLOR);
         this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
     }
 

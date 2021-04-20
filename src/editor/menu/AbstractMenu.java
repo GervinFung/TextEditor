@@ -14,6 +14,7 @@ public abstract class AbstractMenu extends JMenu {
         super(title);
         this.textArea = textArea;
         this.setForeground(TEXT_EDITOR_COLOR.BAR_FONT_COLOR);
+        this.setBorder(null);
     }
 
     protected final TextEditorArea getTextArea() { return this.textArea; }
