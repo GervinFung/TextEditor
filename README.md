@@ -8,9 +8,9 @@
 
 ![Text Editor](TextEditor.jpg)
 
-## File Menu 
+## File Menu
 
-![File Menu](fileMenu.jpg) 
+![File Menu](fileMenu.jpg)
 
 ## Edit Menu
 

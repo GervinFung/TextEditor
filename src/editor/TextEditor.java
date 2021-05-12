@@ -98,50 +98,33 @@ public final class TextEditor extends JFrame {
         return panel;
     }
 
+    private final static class MyBasicScrollBarUI extends BasicScrollBarUI {
+        @Override
+        protected void configureScrollBarColors(){
+            this.thumbColor = TEXT_EDITOR_COLOR.SCROLL_BAR_THUMB_COLOR;
+        }
+        @Override
+        protected JButton createDecreaseButton(int orientation) {
+            JButton button = super.createDecreaseButton(orientation);
+            button.setBackground(TEXT_EDITOR_COLOR.BOTTOM_PANEL_COLOR);
+            return button;
+        }
+        @Override
+        protected JButton createIncreaseButton(int orientation) {
+            JButton button = super.createIncreaseButton(orientation);
+            button.setBackground(TEXT_EDITOR_COLOR.BOTTOM_PANEL_COLOR);
+            return button;
+        }
+    }
+
     private JScrollPane createScrollPane(final JPanel panel) {
         final JScrollPane scrollPane = new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
         scrollPane.getHorizontalScrollBar().setBackground(TEXT_EDITOR_COLOR.BOTTOM_PANEL_COLOR);
         scrollPane.getVerticalScrollBar().setBackground(TEXT_EDITOR_COLOR.BOTTOM_PANEL_COLOR);
 
-        scrollPane.getVerticalScrollBar().setUI(new BasicScrollBarUI() {
-            @Override
-            protected void configureScrollBarColors(){
-                this.thumbColor = TEXT_EDITOR_COLOR.SCROLL_BAR_THUMB_COLOR;
-            }
-            @Override
-            protected JButton createDecreaseButton(int orientation) {
-                JButton button = super.createDecreaseButton(orientation);
-                button.setBackground(TEXT_EDITOR_COLOR.BOTTOM_PANEL_COLOR);
-                return button;
-            }
-            @Override
-            protected JButton createIncreaseButton(int orientation) {
-                JButton button = super.createIncreaseButton(orientation);
-                button.setBackground(TEXT_EDITOR_COLOR.BOTTOM_PANEL_COLOR);
-                return button;
-            }
-
-        });
-        scrollPane.getHorizontalScrollBar().setUI(new BasicScrollBarUI() {
-            @Override
-            protected void configureScrollBarColors(){
-                this.thumbColor = TEXT_EDITOR_COLOR.SCROLL_BAR_THUMB_COLOR;
-            }
-            @Override
-            protected JButton createDecreaseButton(int orientation) {
-                JButton button = super.createDecreaseButton(orientation);
-                button.setBackground(TEXT_EDITOR_COLOR.BOTTOM_PANEL_COLOR);
-                return button;
-            }
-
-            @Override
-            protected JButton createIncreaseButton(int orientation) {
-                JButton button = super.createIncreaseButton(orientation);
-                button.setBackground(TEXT_EDITOR_COLOR.BOTTOM_PANEL_COLOR);
-                return button;
-            }
-        });
+        scrollPane.getVerticalScrollBar().setUI(new MyBasicScrollBarUI());
+        scrollPane.getHorizontalScrollBar().setUI(new MyBasicScrollBarUI());
 
         scrollPane.setBorder(null);
 

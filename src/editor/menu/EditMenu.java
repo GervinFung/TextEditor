@@ -12,6 +12,7 @@ public final class EditMenu extends AbstractMenu {
         this.add(this.copyText());
         this.add(this.pasteText());
         this.add(this.selectAll());
+        this.add(this.deleteText());
         this.addSeparator();
         this.add(this.undo());
         this.add(this.redo());
@@ -33,6 +34,12 @@ public final class EditMenu extends AbstractMenu {
         final JMenuItem pasteText = new JMenuItem("Paste (CTRL + V)");
         pasteText.addActionListener(e -> super.getTextArea().paste());
         return pasteText;
+    }
+
+    private JMenuItem deleteText() {
+        final JMenuItem deleteText = new JMenuItem("Delete (DEL)");
+        deleteText.addActionListener(e -> super.getTextArea().delete());
+        return deleteText;
     }
 
     private JMenuItem undo() {

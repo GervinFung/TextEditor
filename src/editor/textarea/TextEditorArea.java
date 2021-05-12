@@ -151,7 +151,6 @@ public final class TextEditorArea extends JTextArea {
             public void actionPerformed(final ActionEvent evt) { TextEditorArea.this.goToLine(); }
         });
 
-
         this.getInputMap().put(KeyStroke.getKeyStroke("control Z"), KEYBOARD_KEY.UNDO_KEY);
         this.getInputMap().put(KeyStroke.getKeyStroke("control Y"), KEYBOARD_KEY.REDO_KEY);
         this.getInputMap().put(KeyStroke.getKeyStroke("control N"), KEYBOARD_KEY.NEW_FILE);
@@ -174,19 +173,18 @@ public final class TextEditorArea extends JTextArea {
         this.getInputMap().put(KeyStroke.getKeyStroke("control G"), KEYBOARD_KEY.GOTO);
 
         this.addCaretListener(e -> {
-
             try {
-
                 final int caretPosition = TextEditorArea.this.getCaretPosition();
-
                 final int lineNumber = TextEditorArea.this.getLineOfOffset(caretPosition);
-
                 final int columnNumber = caretPosition - TextEditorArea.this.getLineStartOffset(lineNumber);
-
                 this.textEditor.updateCursorPosition(lineNumber + 1, columnNumber + 1);
-
             } catch (final BadLocationException ignored) { }
         });
+    }
+
+    public void delete() {
+        if (this.getText().isEmpty()) { return; }
+        this.replaceSelection("");
     }
 
     public void undo() {
@@ -265,19 +263,19 @@ public final class TextEditorArea extends JTextArea {
 
     public void saveFileBeforeOpening() {
         if (this.getText().isEmpty() || this.currentContent.equals(this.getText())) {
-            this.setText(this.openFile(false));
+            this.setText(this.readFile(false));
         } else {
             final int option = JOptionPane.showConfirmDialog(this.getParent(),"Do you want to save before opening saved file?", "Open File", JOptionPane.YES_NO_CANCEL_OPTION);
             if (option == JOptionPane.YES_OPTION) {
                 this.saveFile();
-                this.setText(this.openFile(false));
+                this.setText(this.readFile(false));
             } else if (option == JOptionPane.NO_OPTION) {
-                this.setText(this.openFile(false));
+                this.setText(this.readFile(false));
             }
         }
     }
 
-    public String openFile(final boolean openInNewWindow) {
+    public String readFile(final boolean openInNewWindow) {
         final int option = FILE_CHOOSER.showOpenDialog(this.getParent());
 
         if (option == JFileChooser.APPROVE_OPTION) {
@@ -313,7 +311,7 @@ public final class TextEditorArea extends JTextArea {
 
     public void openFileInNewWindow() {
         try {
-            final String fileContent = this.openFile(true);
+            final String fileContent = this.readFile(true);
             if (fileContent == null) { return; }
             createNewTextEditorWithFilePath(fileContent, FILE_CHOOSER.getSelectedFile().getAbsolutePath(), FILE_CHOOSER.getSelectedFile().getName());
         }

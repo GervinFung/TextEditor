@@ -86,7 +86,23 @@ public final class TextEditorSearch extends JFrame {
         }
     }
 
-    private void replaceAllWord(final TextEditorArea textEditorArea) { textEditorArea.setText(textEditorArea.getText().replaceAll(this.wordToSearch.getText(), this.replaceWord.getText())); }
+    private void replaceAllWord(final TextEditorArea textEditorArea) {
+        final String searchText = this.wordToSearch.getText();
+        final String textAreaText = textEditorArea.getText();
+        int index = textAreaText.indexOf(searchText);
+        final int len = searchText.length();
+        if (index >= 0) {
+            while(true){
+                if (index >= 0) {
+                    textEditorArea.replaceRange(this.replaceWord.getText(), index, index + len);
+                }
+                else {
+                    return;
+                }
+                index = textEditorArea.getText().indexOf(searchText, index + len);
+            }
+        }
+    }
     
     private JPanel buttonPanel(final TextEditorArea textEditorArea) {
         final JPanel buttonPanel = new JPanel();
