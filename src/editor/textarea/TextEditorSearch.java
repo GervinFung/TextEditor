@@ -118,32 +118,41 @@ public final class TextEditorSearch extends JFrame {
         replaceAllButton.addActionListener(e -> this.replaceAllWord(textEditorArea));
 
         nextButton.addActionListener(e -> {
-            try {
-                final String searchText = this.wordToSearch.getText();
-                final int length = searchText.length();
-                final int index = textEditorArea.getText().indexOf(searchText, textEditorArea.getCaretPosition() + length);
-
-                if (index >= 0) {
-                    textEditorArea.setCaretPosition(index);
-                    textEditorArea.getHighlighter().removeAllHighlights();
-                    textEditorArea.getHighlighter().addHighlight(index, index + length, PAINTER_SEARCH_SPECIFIC);
-                }
-
-            } catch (final BadLocationException badLocationException) { JOptionPane.showMessageDialog(this.getParent(), badLocationException.getMessage()); }
+            final int index = this.findNextWordIndex(textEditorArea);
+            if (index >= 0) {
+                this.findNextWord(textEditorArea, index);
+            } else {
+                final int caretPos = textEditorArea.getCaretPosition();
+                try {
+                    textEditorArea.setCaretPosition(textEditorArea.getLineStartOffset(0));
+                    final int anotherIndex = this.findNextWordIndex(textEditorArea);
+                    if (anotherIndex >= 0) {
+                        this.findNextWord(textEditorArea, anotherIndex);
+                    } else {
+                        textEditorArea.setCaretPosition(caretPos);
+                        JOptionPane.showMessageDialog(this.getParent(), "No Such Keyword. Please try again");
+                    }
+                } catch (final BadLocationException badLocationException) { JOptionPane.showMessageDialog(this.getParent(), badLocationException.getMessage()); }
+            }
         });
+
         previousButton.addActionListener(e -> {
-            try {
-                final String searchText = this.wordToSearch.getText();
-                final int length = searchText.length();
-                final int index = textEditorArea.getText().lastIndexOf(searchText, textEditorArea.getCaretPosition() - length);
-
-                if (index >= 0) {
-                    textEditorArea.setCaretPosition(index);
-                    textEditorArea.getHighlighter().removeAllHighlights();
-                    textEditorArea.getHighlighter().addHighlight(index, index + length, PAINTER_SEARCH_SPECIFIC);
-                }
-
-            } catch (final BadLocationException badLocationException) { JOptionPane.showMessageDialog(textEditorArea.getParent(), badLocationException.getMessage()); }
+            final int index = this.findPreviousWordIndex(textEditorArea);
+            if (index >= 0) {
+                this.findPreviousWord(textEditorArea, index);
+            } else {
+                final int caretPos = textEditorArea.getCaretPosition();
+                try {
+                    textEditorArea.setCaretPosition(textEditorArea.getLineStartOffset(textEditorArea.getText().split("\n").length - 1));
+                    final int anotherIndex = this.findPreviousWordIndex(textEditorArea);
+                    if (anotherIndex >= 0) {
+                        this.findPreviousWord(textEditorArea, anotherIndex);
+                    } else {
+                        textEditorArea.setCaretPosition(caretPos);
+                        JOptionPane.showMessageDialog(this.getParent(), "No Such Keyword. Please try again");
+                    }
+                } catch (final BadLocationException badLocationException) { JOptionPane.showMessageDialog(this.getParent(), badLocationException.getMessage()); }
+            }
         });
 
         replaceButton.addActionListener(e -> TextEditorSearch.this.replaceWord(textEditorArea));
@@ -155,6 +164,40 @@ public final class TextEditorSearch extends JFrame {
         buttonPanel.add(replaceButton);
         
         return buttonPanel;
+    }
+
+    private int findNextWordIndex(final TextEditorArea textEditorArea) {
+        final String searchText = this.wordToSearch.getText();
+        final int length = searchText.length();
+        return textEditorArea.getText().indexOf(searchText, textEditorArea.getCaretPosition() + length);
+    }
+
+    private int findPreviousWordIndex(final TextEditorArea textEditorArea) {
+        final String searchText = this.wordToSearch.getText();
+        final int length = searchText.length();
+        return textEditorArea.getText().lastIndexOf(searchText, textEditorArea.getCaretPosition() - length);
+    }
+
+    private void findNextWord(final TextEditorArea textEditorArea, final int index) {
+        if (index == -1) {
+            throw new IllegalArgumentException("Index cannot be less than 0");
+        }
+        try {
+            textEditorArea.setCaretPosition(index);
+            textEditorArea.getHighlighter().removeAllHighlights();
+            textEditorArea.getHighlighter().addHighlight(index, index + this.wordToSearch.getText().length(), PAINTER_SEARCH_SPECIFIC);
+        } catch (final BadLocationException badLocationException) { JOptionPane.showMessageDialog(this.getParent(), badLocationException.getMessage()); }
+    }
+
+    private void findPreviousWord(final TextEditorArea textEditorArea, final int index) {
+        if (index == -1) {
+            throw new IllegalArgumentException("Index cannot be less than 0");
+        }
+        try {
+            textEditorArea.setCaretPosition(index);
+            textEditorArea.getHighlighter().removeAllHighlights();
+            textEditorArea.getHighlighter().addHighlight(index, index + this.wordToSearch.getText().length(), PAINTER_SEARCH_SPECIFIC);
+        } catch (final BadLocationException badLocationException) { JOptionPane.showMessageDialog(textEditorArea.getParent(), badLocationException.getMessage()); }
     }
 
     private final static class TextFieldFocusListener implements FocusListener {
